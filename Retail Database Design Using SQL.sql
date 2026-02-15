@@ -263,95 +263,311 @@ INSERT INTO order_items (order_id, product_id, quantity, selling_price) VALUES
 (1050,128,1,2150);
 
 
--- JOINS
+-- WHERE Clause (Filtering Records)
+-- 1. Customers from India
+SELECT * 
+FROM customers 
+WHERE country = 'India';
 
--- Customers and their orders
-SELECT c.full_name, o.order_id, o.order_status
+-- 2. Orders that are Delivered
+SELECT * 
+FROM orders 
+WHERE order_status = 'Delivered';
+
+-- 3. Products priced above 10,000
+SELECT * 
+FROM products 
+WHERE price > 10000;
+
+-- 4. Orders placed in February 2025
+SELECT * 
+FROM orders 
+WHERE order_date BETWEEN '2025-02-01' AND '2025-02-28';
+
+-- 5. Customers from Delhi or Mumbai
+SELECT * 
+FROM customers 
+WHERE city IN ('Delhi','Mumbai');
+
+
+
+-- GROUP BY Clause (Aggregation)
+
+-- 1. Total customers per country
+SELECT country, COUNT(*) AS total_customers
+FROM customers
+GROUP BY country;
+
+-- 2. Total orders per order_status
+SELECT order_status, COUNT(*) AS total_orders
+FROM orders
+GROUP BY order_status;
+
+-- 3. Total quantity sold per product
+SELECT product_id, SUM(quantity) AS total_quantity
+FROM order_items
+GROUP BY product_id;
+
+-- 4. Revenue generated per product
+SELECT product_id, SUM(quantity * selling_price) AS total_revenue
+FROM order_items
+GROUP BY product_id;
+
+-- 5. Orders per customer
+SELECT customer_id, COUNT(*) AS total_orders
+FROM orders
+GROUP BY customer_id;
+
+
+
+-- HAVING Clause (Filtering Aggregates)
+-- 1. Products sold more than 3 times
+SELECT product_id, SUM(quantity) AS total_qty
+FROM order_items
+GROUP BY product_id
+HAVING SUM(quantity) > 3;
+
+-- 2. Customers having more than 1 order
+SELECT customer_id, COUNT(*) AS total_orders
+FROM orders
+GROUP BY customer_id
+HAVING COUNT(*) > 1;
+
+-- 3. Categories generating revenue > 50000
+SELECT p.category_id, SUM(oi.quantity * oi.selling_price) AS revenue
+FROM order_items oi
+JOIN products p ON oi.product_id = p.product_id
+GROUP BY p.category_id
+HAVING revenue > 50000;
+
+-- 4. Cities with more than 2 customers
+SELECT city, COUNT(*) AS total_customers
+FROM customers
+GROUP BY city
+HAVING COUNT(*) > 2;
+
+
+
+-- ORDER BY Clause (Sorting)
+-- 1. Top expensive products
+SELECT * 
+FROM products 
+ORDER BY price DESC;
+
+-- 2. Latest orders first
+SELECT * 
+FROM orders 
+ORDER BY order_date DESC;
+
+-- 3. Highest selling revenue products
+SELECT product_id, SUM(quantity * selling_price) AS revenue
+FROM order_items
+GROUP BY product_id
+ORDER BY revenue DESC;
+
+-- 4. Customers sorted by city
+SELECT * 
+FROM customers
+ORDER BY city;
+
+
+
+
+-- SUBQUERY (Nested Query)
+-- 1. Products priced above average price
+SELECT * 
+FROM products
+WHERE price > (SELECT AVG(price) FROM products);
+
+-- 2. Customers who placed orders
+SELECT * 
+FROM customers
+WHERE customer_id IN (SELECT customer_id FROM orders);
+
+-- 3. Products never sold
+SELECT * 
+FROM products
+WHERE product_id NOT IN (SELECT product_id FROM order_items);
+
+-- 4. Highest order value product
+SELECT *
+FROM products
+WHERE product_id = (
+    SELECT product_id 
+    FROM order_items
+    ORDER BY selling_price DESC
+    LIMIT 1
+);
+
+-- 5. Customers who placed highest number of orders
+SELECT *
+FROM customers
+WHERE customer_id = (
+    SELECT customer_id 
+    FROM orders
+    GROUP BY customer_id
+    ORDER BY COUNT(*) DESC
+    LIMIT 1
+);
+
+
+-- INNER JOIN
+-- 1. Customer order details
+SELECT c.full_name, o.order_id, o.order_date
 FROM customers c
 INNER JOIN orders o ON c.customer_id = o.customer_id;
 
--- Products never sold (ANTI-JOIN)
-SELECT p.product_name
+-- 2. Order item details with product name
+SELECT oi.order_id, p.product_name, oi.quantity
+FROM order_items oi
+INNER JOIN products p ON oi.product_id = p.product_id;
+
+-- 3. Category wise sales
+SELECT cat.category_name, SUM(oi.quantity * oi.selling_price) AS revenue
+FROM categories cat
+INNER JOIN products p ON cat.category_id = p.category_id
+INNER JOIN order_items oi ON p.product_id = oi.product_id
+GROUP BY cat.category_name;
+
+
+
+-- LEFT OUTER JOIN
+-- 1. All customers and their orders (including customers with no orders)
+SELECT c.full_name, o.order_id
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id;
+
+-- 2. Products and their sales
+SELECT p.product_name, oi.quantity
 FROM products p
-LEFT JOIN order_items oi ON p.product_id = oi.product_id
-WHERE oi.product_id IS NULL;
+LEFT JOIN order_items oi ON p.product_id = oi.product_id;
 
--- INTERSECTION: Customers who ordered Electronics
-SELECT DISTINCT c.full_name
+-- 3. Categories without any products
+SELECT cat.*
+FROM categories cat
+LEFT JOIN products p ON cat.category_id = p.category_id
+WHERE p.product_id IS NULL;
+
+
+
+-- RIGHT OUTER JOIN
+-- 1. Orders and customer info
+SELECT c.full_name, o.order_id
 FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-JOIN order_items oi ON o.order_id = oi.order_id
-JOIN products p ON oi.product_id = p.product_id
-WHERE p.category_id = 1;
+RIGHT JOIN orders o ON c.customer_id = o.customer_id;
 
--- AGGREGATIONS
+-- 2. Products sold even if product data missing
+SELECT p.product_name, oi.quantity
+FROM products p
+RIGHT JOIN order_items oi ON p.product_id = oi.product_id;
 
--- Total sales per customer
-SELECT c.full_name, SUM(oi.quantity * oi.selling_price) AS total_spent
+
+
+-- FULL OUTER JOIN (MySQL Alternative Using UNION)
+SELECT c.customer_id, o.order_id
 FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-JOIN order_items oi ON o.order_id = oi.order_id
-GROUP BY c.full_name;
+LEFT JOIN orders o ON c.customer_id = o.customer_id
 
--- Top selling product
-SELECT p.product_name, SUM(oi.quantity) AS total_qty
+UNION
+
+SELECT c.customer_id, o.order_id
+FROM customers c
+RIGHT JOIN orders o ON c.customer_id = o.customer_id;
+
+
+-- CROSS JOIN (Cartesian Product)
+-- 1. All product-category combinations
+SELECT p.product_name, c.category_name
+FROM products p
+CROSS JOIN categories c;
+
+-- 2. All customer-product combinations
+SELECT c.full_name, p.product_name
+FROM customers c
+CROSS JOIN products p;
+
+
+-- SELF JOIN
+-- 1. Customers from same city
+SELECT A.full_name, B.full_name, A.city
+FROM customers A
+JOIN customers B
+ON A.city = B.city AND A.customer_id <> B.customer_id;
+
+-- 2. Customers from same country
+SELECT A.full_name, B.full_name, A.country
+FROM customers A
+JOIN customers B
+ON A.country = B.country AND A.customer_id < B.customer_id;
+
+
+-- NATURAL JOIN
+-- 1. Customers and orders
+SELECT *
+FROM customers
+NATURAL JOIN orders;
+
+-- 2. Products and categories
+SELECT *
+FROM products
+NATURAL JOIN categories;
+
+
+
+-- ANTI JOIN (NOT EXISTS / NOT IN)
+SELECT *
+FROM customers c
+WHERE NOT EXISTS (
+    SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id
+);
+
+
+
+-- Right Anti Join (Orders without customers)
+SELECT *
+FROM orders o
+WHERE NOT EXISTS (
+    SELECT 1 FROM customers c WHERE c.customer_id = o.customer_id
+);
+
+
+-- NON-EQUI JOIN
+-- 1. Products where selling price > original price
+SELECT p.product_name, oi.selling_price, p.price
+FROM products p
+JOIN order_items oi
+ON oi.product_id = p.product_id
+AND oi.selling_price > p.price;
+
+-- 2. High discount products
+SELECT p.product_name, oi.selling_price, p.price
+FROM products p
+JOIN order_items oi
+ON oi.product_id = p.product_id
+AND (p.price - oi.selling_price) > 500;
+
+
+
+-- ADVANCED ANALYTICS QUERIES
+-- Top 5 revenue generating products
+SELECT p.product_name, SUM(oi.quantity * oi.selling_price) AS revenue
 FROM products p
 JOIN order_items oi ON p.product_id = oi.product_id
 GROUP BY p.product_name
-ORDER BY total_qty DESC
-LIMIT 1;
+ORDER BY revenue DESC
+LIMIT 5;
 
--- WINDOW FUNCTIONS
-
-SELECT
-    c.full_name,
-    SUM(oi.quantity * oi.selling_price) AS total_spent,
-    RANK() OVER (ORDER BY SUM(oi.quantity * oi.selling_price) DESC) AS spending_rank
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
+-- Monthly sales report
+SELECT MONTH(o.order_date) AS month, 
+       SUM(oi.quantity * oi.selling_price) AS revenue
+FROM orders o
 JOIN order_items oi ON o.order_id = oi.order_id
-GROUP BY c.full_name;
+GROUP BY MONTH(o.order_date);
 
--- PHASE 8: VIEWS
+-- Repeat customers
+SELECT customer_id, COUNT(*) AS orders_count
+FROM orders
+GROUP BY customer_id
+HAVING COUNT(*) > 1;
 
-CREATE VIEW vw_customer_sales AS
-SELECT c.customer_id, c.full_name,
-       SUM(oi.quantity * oi.selling_price) AS total_spent
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-JOIN order_items oi ON o.order_id = oi.order_id
-GROUP BY c.customer_id, c.full_name;
 
--- STORED PROCEDURE
-
-DELIMITER //
-CREATE PROCEDURE get_customer_orders(IN cid INT)
-BEGIN
-    SELECT o.order_id, o.order_date, o.order_status
-    FROM orders o
-    WHERE o.customer_id = cid;
-END //
-DELIMITER ;
-
--- TRIGGER
-
-DELIMITER //
-CREATE TRIGGER trg_reduce_stock
-AFTER INSERT ON order_items
-FOR EACH ROW
-BEGIN
-    UPDATE products
-    SET stock = stock - NEW.quantity
-    WHERE product_id = NEW.product_id;
-END //
-DELIMITER ;
-
--- INDEX
-
-CREATE INDEX idx_orders_customer ON orders(customer_id);
-
--- TRANSACTION
-
-START TRANSACTION;
-INSERT INTO orders VALUES (1004,1,CURDATE(),'Pending');
-ROLLBACK;
