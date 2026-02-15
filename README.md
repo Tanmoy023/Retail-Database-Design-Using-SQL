@@ -1,97 +1,85 @@
 # 🛒 Retail-Database-Design-Using-SQL
 
 ## 📌 Project Overview
-The **Retail-Database-Design-Using-SQL** is an end-to-end SQL project designed to simulate real-world retail operations and demonstrate industry-level database design and data analysis using **MySQL**.  
-The project focuses on building a normalized relational database, inserting large-scale transactional data, and extracting meaningful business insights through advanced SQL queries.
-
-This project highlights strong fundamentals in **RDBMS concepts**, **SQL analytics**, and **database optimization**, making it suitable for Data Analyst and SQL Developer roles.
+This project focuses on designing and implementing a fully normalized **Retail Analytics Database** using **MySQL**. It simulates a real-world retail system with customers, products, categories, orders, and transactional sales data, enabling advanced SQL-based business analytics.
 
 ---
 
-## 🧱 Database Design
-The database consists of **5 core tables**, designed with proper normalization and relationships:
-
-- **customers** – Stores customer demographic information  
-- **categories** – Defines product categories  
-- **products** – Maintains product details and inventory  
-- **orders** – Captures order-level information  
-- **order_items** – Stores transactional order details  
-
-Primary keys, foreign keys, and constraints are used to ensure **data integrity and consistency**.
-
-An **EER (Enhanced Entity-Relationship) Diagram** was generated using **MySQL Workbench** to visualize the schema and table relationships.
+## 🎯 Objectives
+- Design a scalable and normalized relational database.
+- Implement real-world transactional data models.
+- Perform advanced SQL queries for business insights.
+- Practice complex joins, subqueries, aggregations, and analytical queries.
+- Build an industry-relevant SQL portfolio project.
 
 ---
 
-## 🛠️ SQL Concepts & Features Used
-This project covers all major SQL concepts required in industry:
+## 🗂️ Database Schema
+The database consists of the following core tables:
 
-- Database & table creation (DDL)
-- Data insertion with large realistic datasets
-- Primary Key, Foreign Key, and constraints
-- INNER JOIN, LEFT JOIN, and set-based logic
-- Aggregations (`SUM`, `GROUP BY`)
-- Window functions (`RANK`)
-- Views for reusable analytics
-- Indexes for performance optimization
-- Stored Procedures for parameterized queries
-- Triggers for automated stock updates
-- Transactions (`COMMIT` / `ROLLBACK`)
-- Schema visualization using EER diagrams
+- **customers** – Stores customer details.
+- **categories** – Stores product categories.
+- **products** – Stores product information.
+- **orders** – Stores order transactions.
+- **order_items** – Stores detailed product-level sales records.
 
 ---
 
-## 📊 Business Analytics Performed
-- Customer-wise total sales and spending rank
-- Best-selling products and top categories
-- Unsold and low-performing products
-- Order status distribution (Delivered, Cancelled, Returned)
-- Category-wise revenue contribution
-- Inventory impact through automated triggers
+## 🔗 Entity Relationship Diagram (ERD)
+The database schema follows a normalized relational design with clear relationships between:
+
+- Customers → Orders  
+- Orders → Order Items  
+- Products → Categories  
+
+*(EER diagram generated using MySQL Workbench)*
 
 ---
 
-## 🧪 Sample Use Cases
-- Identify top customers based on revenue
-- Analyze product demand and stock movement
-- Optimize queries using indexes
-- Reuse business logic via views and procedures
-- Visualize database relationships using EER diagrams
-
----
-
-## 🖥️ Tools & Technologies
+## ⚙️ Technologies Used
 - **Database:** MySQL  
-- **IDE:** MySQL Workbench  
-- **Concepts:** SQL, RDBMS, Data Analytics  
+- **Tool:** MySQL Workbench  
+- **Language:** SQL  
 
 ---
 
-## 📂 How to Run the Project
-1. Open **MySQL Workbench**
-2. Create a new SQL tab
-3. Run the provided SQL script (`smart_retail_analytics.sql`)
-4. Verify tables and data using `SELECT` queries
-5. Generate the EER diagram using:  
-   `Database → Reverse Engineer`
+## 📊 Key SQL Concepts Implemented
+- WHERE, GROUP BY, HAVING, ORDER BY  
+- Subqueries & Nested Queries  
+- INNER JOIN, LEFT JOIN, RIGHT JOIN  
+- FULL OUTER JOIN (using UNION)  
+- CROSS JOIN  
+- SELF JOIN  
+- NATURAL JOIN  
+- ANTI JOIN (LEFT & RIGHT)  
+- NON-EQUI JOIN  
+- Advanced Analytical Queries  
 
 ---
 
-## 🎯 Learning Outcomes
-- Hands-on experience with industry-style SQL projects
-- Strong understanding of relational database design
-- Ability to write complex analytical SQL queries
-- Practical exposure to database optimization techniques
-- Confidence in explaining database projects during interviews
+## 🔥 Advanced Analytics Queries
+- Top revenue-generating products  
+- Monthly sales performance analysis  
+- Customer repeat purchase analysis  
+- Category-wise revenue breakdown  
+- Order status distribution  
 
 ---
 
-## 👤 Author
-**Tanmoy Patra**  
-📧 Email: tanmoypatra369@gmail.com  
-🔗 LinkedIn: https://www.linkedin.com/in/tanmoy-patra-00b756236  
-💻 GitHub: https://github.com/Tanmoy023  
+## 🧠 Business Insights Enabled
+- Identify high-performing products and categories  
+- Analyze customer purchase behavior  
+- Track monthly revenue trends  
+- Monitor operational efficiency  
+- Improve data-driven decision-making  
 
 ---
 
-⭐ *If you find this project useful, feel free to star the repository!*  
+## 🚀 How To Run
+1. Install MySQL Server & MySQL Workbench.
+2. Execute the SQL script provided in the repository.
+3. Run analytical queries to generate insights.
+
+---
+
+## 📁 Project Structure
